@@ -69,6 +69,7 @@ static void read_callback(struct SoundIoInStream *instream, int frame_count_min,
     char *write_ptr = soundio_ring_buffer_write_ptr(ring_buffer);
     int free_bytes = soundio_ring_buffer_free_count(ring_buffer);
     int free_count = free_bytes / instream->bytes_per_frame;
+    fprintf(stderr, "[read] free_count %d\n", free_count);
 
     if (frame_count_min > free_count)
         panic("ring buffer overflow");
@@ -113,7 +114,6 @@ static void read_callback(struct SoundIoInStream *instream, int frame_count_min,
 }
 
 static void write_callback(struct SoundIoOutStream *outstream, int frame_count_min, int frame_count_max) {
-    fprintf(stderr, "[write] frame_count_min %d\n", frame_count_min); 
     struct SoundIoChannelArea *areas;
     int frames_left;
     int frame_count;
@@ -123,6 +123,9 @@ static void write_callback(struct SoundIoOutStream *outstream, int frame_count_m
     int fill_bytes = soundio_ring_buffer_fill_count(ring_buffer);
     int fill_count = fill_bytes / outstream->bytes_per_frame;
 
+    fprintf(stderr, "[write] frame_count_min %d vs frame_count_max %d\n", frame_count_min, fill_count); 
+
+
     if (frame_count_min > fill_count) {
         // Ring buffer does not have enough data, fill with zeroes.
         frames_left = frame_count_min;
@@ -130,6 +133,8 @@ static void write_callback(struct SoundIoOutStream *outstream, int frame_count_m
             frame_count = frames_left;
             if (frame_count <= 0)
               return;
+            fprintf(stderr, "[write] frame_count %d\n", frame_count); 
+
             if ((err = soundio_outstream_begin_write(outstream, &areas, &frame_count)))
                 panic("begin write error: %s", soundio_strerror(err));
             if (frame_count <= 0)
@@ -202,7 +207,7 @@ int main(int argc, char **argv) {
     bool in_raw = false;
     bool out_raw = false;
 
-    double microphone_latency = 0.2; // seconds
+    double microphone_latency = 0.01; // seconds
 
     for (int i = 1; i < argc; i += 1) {
         char *arg = argv[i];
