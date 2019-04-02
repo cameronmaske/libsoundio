@@ -63,6 +63,7 @@ static int min_int(int a, int b) {
 }
 
 static void read_callback(struct SoundIoInStream *instream, int frame_count_min, int frame_count_max) {
+    fprintf(stderr, "[read] frame_count_min %d\n", frame_count_min);
     struct SoundIoChannelArea *areas;
     int err;
     char *write_ptr = soundio_ring_buffer_write_ptr(ring_buffer);
@@ -112,6 +113,7 @@ static void read_callback(struct SoundIoInStream *instream, int frame_count_min,
 }
 
 static void write_callback(struct SoundIoOutStream *outstream, int frame_count_min, int frame_count_max) {
+    fprintf(stderr, "[write] frame_count_min %d\n", frame_count_min); 
     struct SoundIoChannelArea *areas;
     int frames_left;
     int frame_count;
@@ -150,6 +152,7 @@ static void write_callback(struct SoundIoOutStream *outstream, int frame_count_m
     while (frames_left > 0) {
         int frame_count = frames_left;
 
+        fprintf(stderr, "frames>0\n");
         if ((err = soundio_outstream_begin_write(outstream, &areas, &frame_count)))
             panic("begin write error: %s", soundio_strerror(err));
 
