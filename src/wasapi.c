@@ -1807,7 +1807,7 @@ static int instream_do_open(struct SoundIoPrivate *si, struct SoundIoInStreamPri
         share_mode = AUDCLNT_SHAREMODE_SHARED;
         periodicity = 0;
         fprintf(stderr, "[in] software latency %f\n", instream->software_latency); 
-        buffer_duration = to_reference_time(instream->software_latency);
+        buffer_duration = 0;
     }
     to_wave_format_layout(&instream->layout, &wave_format);
     to_wave_format_format(instream->format, &wave_format);
